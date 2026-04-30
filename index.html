@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Notepad</title>
+</head>
+<body>
+
+<h2>📝 My Online Notepad</h2>
+
+<textarea id="note" rows="20" cols="80"></textarea><br><br>
+
+<button onclick="save()">Save</button>
+
+<script>
+async function load() {
+    const res = await fetch('/notes');
+    const text = await res.text();
+    document.getElementById("note").value = text;
+}
+
+async function save() {
+    await fetch('/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: document.getElementById("note").value })
+    });
+    alert("Saved!");
+}
+
+load();
+</script>
+
+</body>
+</html>
