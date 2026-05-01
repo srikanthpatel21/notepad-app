@@ -1,14 +1,15 @@
 {
   "name": "notepad-app",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "echo \"No tests configured\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Personal profile website for sriaknthvodnala.in",
   "dependencies": {
     "express": "^5.2.1"
   }

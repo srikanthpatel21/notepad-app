@@ -3,463 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workspace Notepad</title>
+    <title>Srikanth Vodnala | Personal Site</title>
     <style>
         :root {
-            --bg-1: #0f172a;
-            --bg-2: #1e1b4b;
-            --bg-3: #312e81;
-            --panel: rgba(15, 23, 42, 0.65);
+            --bg: #0b1020;
+            --panel: rgba(15, 23, 42, 0.82);
+            --panel-2: rgba(30, 41, 59, 0.65);
             --text: #e2e8f0;
             --muted: #94a3b8;
-            --accent: #8b5cf6;
-            --border: rgba(148, 163, 184, 0.25);
-            --success: #22c55e;
-            --danger: #ef4444;
+            --accent: #38bdf8;
+            --accent-2: #818cf8;
+            --border: rgba(148, 163, 184, 0.28);
+            --ok: #34d399;
         }
+
         * { box-sizing: border-box; }
+
         body {
             margin: 0;
-            min-height: 100vh;
             font-family: "Segoe UI", Arial, sans-serif;
-            color: var(--text);
             background:
-                radial-gradient(circle at 10% 15%, rgba(139, 92, 246, 0.3), transparent 45%),
-                radial-gradient(circle at 85% 10%, rgba(14, 165, 233, 0.22), transparent 40%),
-                linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
+                radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.16), transparent 38%),
+                radial-gradient(circle at 80% 15%, rgba(129, 140, 248, 0.22), transparent 35%),
+                linear-gradient(140deg, #0b1020, #111827 52%, #1e1b4b);
+            color: var(--text);
+            min-height: 100vh;
         }
-        .app {
-            width: min(1180px, 100%);
-            min-height: min(86vh, 760px);
-            background: var(--panel);
+
+        .container {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            padding: 22px;
+        }
+
+        .hero {
             border: 1px solid var(--border);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 24px 60px rgba(2, 6, 23, 0.45);
-            display: flex;
-            overflow: hidden;
+            border-radius: 18px;
+            background: var(--panel);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 24px 60px rgba(2, 6, 23, 0.35);
+            padding: 28px;
         }
-        .sidebar {
-            width: min(340px, 44vw);
-            border-right: 1px solid var(--border);
-            background: rgba(2, 6, 23, 0.45);
-            display: flex;
-            flex-direction: column;
-            min-height: 100%;
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(1.7rem, 3vw, 2.5rem);
         }
-        .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); }
-        .sidebar-header h2 { margin: 0 0 8px; font-size: 1.02rem; }
-        .sidebar-header p { margin: 0; color: var(--muted); font-size: 0.86rem; }
-        .sidebar-actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
-        .tree { padding: 10px 10px 14px; overflow: auto; flex: 1; }
-        .tree-node { margin: 2px 0; }
-        .node-row {
-            display: flex;
+
+        .hero p {
+            color: var(--muted);
+            margin: 8px 0 0;
+            line-height: 1.6;
+        }
+
+        .badge {
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            width: 100%;
-            border: 1px solid transparent;
-            border-radius: 9px;
-            color: var(--text);
-            background: transparent;
-            cursor: pointer;
-            padding: 8px 10px;
-            text-align: left;
+            margin-top: 14px;
+            padding: 8px 12px;
+            border: 1px solid rgba(52, 211, 153, 0.4);
+            color: var(--ok);
+            border-radius: 999px;
+            font-size: 0.88rem;
+            background: rgba(16, 185, 129, 0.09);
         }
-        .node-row:hover { background: rgba(30, 41, 59, 0.8); border-color: rgba(148, 163, 184, 0.16); }
-        .node-row.active { background: rgba(99, 102, 241, 0.22); border-color: rgba(165, 180, 252, 0.4); }
-        .node-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.94rem; }
-        .tree-node-children { margin-left: 16px; border-left: 1px dashed rgba(148, 163, 184, 0.25); padding-left: 6px; }
-        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        .main-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
+
+        .tabs {
+            margin-top: 18px;
             display: flex;
-            justify-content: space-between;
             gap: 10px;
             flex-wrap: wrap;
         }
-        .title-wrap { min-width: 0; }
-        .title-input {
-            margin: 0;
-            width: min(520px, 100%);
-            max-width: 100%;
-            border: 1px solid transparent;
-            border-radius: 8px;
-            padding: 7px 10px;
+
+        .tab {
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.72);
             color: var(--text);
-            background: transparent;
-            font-size: 1.05rem;
-            font-weight: 700;
-            outline: none;
-        }
-        .title-input:focus { border-color: rgba(139, 92, 246, 0.7); background: rgba(15, 23, 42, 0.56); }
-        .breadcrumb {
-            margin-top: 6px;
-            color: var(--muted);
-            font-size: 0.84rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .status { font-size: 0.88rem; color: var(--muted); min-width: 90px; }
-        button {
-            border: none;
-            background: linear-gradient(120deg, var(--accent), #6366f1);
-            color: #fff;
-            font-weight: 600;
-            padding: 10px 16px;
+            padding: 10px 14px;
             border-radius: 10px;
             cursor: pointer;
-            transition: transform 0.15s ease, filter 0.15s ease;
+            font-weight: 600;
+            transition: background 0.2s ease, border-color 0.2s ease;
         }
-        button:hover { filter: brightness(1.05); transform: translateY(-1px); }
-        button:active { transform: translateY(0); }
-        button:disabled { cursor: not-allowed; opacity: 0.7; transform: none; }
-        button.secondary { background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(148, 163, 184, 0.32); }
-        button.danger { background: linear-gradient(120deg, #b91c1c, var(--danger)); }
-        .editor-wrap { padding: 20px; flex: 1; display: flex; flex-direction: column; }
-        textarea {
-            width: 100%;
-            height: 100%;
-            resize: none;
+
+        .tab:hover {
+            background: rgba(30, 41, 59, 0.82);
+        }
+
+        .tab.active {
+            background: linear-gradient(120deg, rgba(56, 189, 248, 0.22), rgba(129, 140, 248, 0.25));
+            border-color: rgba(56, 189, 248, 0.7);
+        }
+
+        .panel {
+            margin-top: 14px;
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 16px;
-            background: rgba(15, 23, 42, 0.62);
-            color: var(--text);
-            font-size: 1rem;
-            line-height: 1.65;
-            outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        textarea::placeholder { color: #a5b4fc; opacity: 0.7; }
-        textarea:focus { border-color: rgba(139, 92, 246, 0.8); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25); }
-        .footer {
-            border-top: 1px solid var(--border);
-            padding: 11px 20px;
-            color: var(--muted);
-            font-size: 0.84rem;
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .ok { color: var(--success); }
-        .error { color: #f87171; }
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            color: var(--muted);
-            border: 1px dashed var(--border);
-            border-radius: 14px;
-            height: 100%;
-            text-align: center;
+            border-radius: 16px;
             padding: 20px;
+            background: var(--panel-2);
+            min-height: 330px;
         }
+
+        .panel h2 {
+            margin: 0 0 10px;
+            font-size: 1.35rem;
+        }
+
+        .panel p, .panel li {
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 14px;
+            margin-top: 12px;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            background: rgba(15, 23, 42, 0.55);
+        }
+
+        .card h3 {
+            margin: 0 0 8px;
+            font-size: 1rem;
+        }
+
+        .coming {
+            font-size: 0.82rem;
+            color: #a5b4fc;
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(129, 140, 248, 0.45);
+            background: rgba(99, 102, 241, 0.14);
+        }
+
+        footer {
+            color: #64748b;
+            text-align: center;
+            margin-top: 22px;
+            font-size: 0.87rem;
+        }
+
         @media (max-width: 640px) {
-            body { padding: 10px; }
-            .app { min-height: 95vh; border-radius: 14px; flex-direction: column; }
-            .sidebar { width: 100%; max-height: 42vh; border-right: none; border-bottom: 1px solid var(--border); }
-            .main-header { padding: 14px; }
-            .editor-wrap { padding: 14px; }
+            .container { padding: 12px; }
+            .hero { padding: 18px; }
+            .panel { padding: 14px; }
+            .tab { width: 100%; text-align: left; }
         }
     </style>
 </head>
 <body>
-    <main class="app">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>Pages</h2>
-                <p>Create parent and child pages like a wiki.</p>
-                <div class="sidebar-actions">
-                    <button id="addRootBtn" type="button">+ New Page</button>
-                    <button id="addChildBtn" type="button" class="secondary">+ Child Page</button>
-                </div>
-            </div>
-            <div id="tree" class="tree"></div>
-        </aside>
-        <section class="main">
-            <header class="main-header">
-                <div class="title-wrap">
-                    <input id="titleInput" class="title-input" type="text" value="" placeholder="Page title">
-                    <div id="breadcrumb" class="breadcrumb">Select or create a page to begin</div>
-                </div>
-                <div class="toolbar">
-                    <div id="status" class="status">Loading...</div>
-                    <button id="saveBtn" type="button">Save</button>
-                    <button id="deleteBtn" type="button" class="danger">Delete</button>
-                </div>
-            </header>
-            <section class="editor-wrap">
-                <textarea id="note" placeholder="Write page content..."></textarea>
-                <div id="emptyState" class="empty-state" style="display:none;">
-                    <strong>No page selected.</strong>
-                    <span>Create a page from the left panel to start writing.</span>
-                </div>
-            </section>
-            <footer class="footer">
-                <span id="meta">0 characters</span>
-                <span>Tip: Press Ctrl+S to save current page.</span>
-            </footer>
+    <div class="container">
+        <section class="hero">
+            <h1>Hi, I am Srikanth Vodnala</h1>
+            <p>Welcome to my personal website. This space shares my profile, blog updates, learnings, and hands-on engineering projects across software and Arduino.</p>
+            <span class="badge">Live site refresh in progress</span>
+
+            <nav class="tabs" id="tabs">
+                <button class="tab active" data-tab="about">About Srikanth</button>
+                <button class="tab" data-tab="blogs">Blogs</button>
+                <button class="tab" data-tab="learnings">Learnings</button>
+                <button class="tab" data-tab="software">Software Projects</button>
+                <button class="tab" data-tab="arduino">Arduino Projects</button>
+            </nav>
+
+            <article class="panel" id="panel"></article>
         </section>
-    </main>
+
+        <footer>
+            sriaknthvodnala.in | Built with Node.js + Express
+        </footer>
+    </div>
+
     <script>
-        const treeEl = document.getElementById("tree");
-        const noteEl = document.getElementById("note");
-        const titleInputEl = document.getElementById("titleInput");
-        const saveBtn = document.getElementById("saveBtn");
-        const deleteBtn = document.getElementById("deleteBtn");
-        const addRootBtn = document.getElementById("addRootBtn");
-        const addChildBtn = document.getElementById("addChildBtn");
-        const statusEl = document.getElementById("status");
-        const metaEl = document.getElementById("meta");
-        const breadcrumbEl = document.getElementById("breadcrumb");
-        const emptyStateEl = document.getElementById("emptyState");
+        const tabsEl = document.getElementById("tabs");
+        const panelEl = document.getElementById("panel");
 
-        const state = { pagesById: {}, tree: [], selectedPageId: null, unsavedContent: false, unsavedTitle: false };
+        const sections = {
+            about: `
+                <h2>About Srikanth</h2>
+                <p>I am a software enthusiast exploring backend development, web apps, cloud deployment, and electronics projects. I like building practical solutions and documenting my journey.</p>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>Focus Areas</h3>
+                        <p>Web development, API design, cloud deployments, automation, and embedded experimentation.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Current Goal</h3>
+                        <p>Build a strong portfolio with real-world projects and consistent technical learning.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Location</h3>
+                        <p>India</p>
+                    </div>
+                </div>
+            `,
+            blogs: `
+                <h2>Blogs</h2>
+                <p>Technical articles, build notes, and project retrospectives will be published here.</p>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>First Blog Series</h3>
+                        <p>From beginner projects to production-ready workflows.</p>
+                        <span class="coming">Coming soon</span>
+                    </div>
+                    <div class="card">
+                        <h3>Deployment Diaries</h3>
+                        <p>Lessons learned from hosting apps on Raspberry Pi and cloud.</p>
+                        <span class="coming">Coming soon</span>
+                    </div>
+                </div>
+            `,
+            learnings: `
+                <h2>Learnings</h2>
+                <p>A running list of concepts and tools I am currently exploring:</p>
+                <ul>
+                    <li>Node.js and Express fundamentals</li>
+                    <li>Docker and Kubernetes hands-on practice</li>
+                    <li>CI/CD basics and server operations</li>
+                    <li>System design and API architecture</li>
+                </ul>
+                <span class="coming">Detailed notes coming soon</span>
+            `,
+            software: `
+                <h2>Software Projects</h2>
+                <p>Applications and experiments built using web and backend technologies.</p>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>Portfolio Website</h3>
+                        <p>This website revamp and future improvements.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Project Showcase</h3>
+                        <p>A curated list of apps with source links and architecture notes.</p>
+                        <span class="coming">Coming soon</span>
+                    </div>
+                </div>
+            `,
+            arduino: `
+                <h2>Arduino Projects</h2>
+                <p>Electronics prototypes, IoT ideas, and hardware-software integrations.</p>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>Sensor Monitoring</h3>
+                        <p>Basic monitoring and data logging concepts.</p>
+                        <span class="coming">Coming soon</span>
+                    </div>
+                    <div class="card">
+                        <h3>Home Automation</h3>
+                        <p>Automated control experiments using microcontrollers.</p>
+                        <span class="coming">Coming soon</span>
+                    </div>
+                </div>
+            `
+        };
 
-        function setStatus(message, type) {
-            statusEl.textContent = message;
-            statusEl.classList.remove("ok", "error");
-            if (type === "ok") statusEl.classList.add("ok");
-            if (type === "error") statusEl.classList.add("error");
+        function setActive(tabId) {
+            const tabButtons = tabsEl.querySelectorAll(".tab");
+            tabButtons.forEach((btn) => {
+                const isCurrent = btn.dataset.tab === tabId;
+                btn.classList.toggle("active", isCurrent);
+            });
+            panelEl.innerHTML = sections[tabId] || sections.about;
         }
 
-        function selectedPage() {
-            if (!state.selectedPageId) return null;
-            return state.pagesById[state.selectedPageId] || null;
-        }
-
-        function updateMeta() {
-            metaEl.textContent = noteEl.value.length + " characters";
-        }
-
-        function toggleEditor(enabled) {
-            noteEl.style.display = enabled ? "block" : "none";
-            emptyStateEl.style.display = enabled ? "none" : "flex";
-            noteEl.disabled = !enabled;
-            titleInputEl.disabled = !enabled;
-            saveBtn.disabled = !enabled;
-            deleteBtn.disabled = !enabled;
-            addChildBtn.disabled = !enabled;
-        }
-
-        function escapeHtml(text) {
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-        }
-
-        function renderTreeNode(node, depth) {
-            const active = node.id === state.selectedPageId ? "active" : "";
-            const safeTitle = escapeHtml(node.title);
-            let html = `
-                <div class="tree-node">
-                    <button class="node-row ${active}" data-page-id="${node.id}" style="padding-left:${10 + depth * 14}px;">
-                        <span>📄</span>
-                        <span class="node-title">${safeTitle}</span>
-                    </button>`;
-            if (node.children && node.children.length > 0) {
-                html += `<div class="tree-node-children">`;
-                html += node.children.map((child) => renderTreeNode(child, depth + 1)).join("");
-                html += `</div>`;
-            }
-            html += `</div>`;
-            return html;
-        }
-
-        function renderTree() {
-            if (!state.tree.length) {
-                treeEl.innerHTML = `<div class="empty-state" style="height:auto;">No pages yet. Create your first page.</div>`;
-                return;
-            }
-            treeEl.innerHTML = state.tree.map((node) => renderTreeNode(node, 0)).join("");
-        }
-
-        function breadcrumbForPage(pageId) {
-            if (!pageId || !state.pagesById[pageId]) return "";
-            const names = [];
-            let cursor = state.pagesById[pageId];
-            while (cursor) {
-                names.unshift(cursor.title);
-                cursor = cursor.parentId ? state.pagesById[cursor.parentId] : null;
-            }
-            return names.join(" / ");
-        }
-
-        function renderEditor() {
-            const page = selectedPage();
-            if (!page) {
-                titleInputEl.value = "";
-                noteEl.value = "";
-                breadcrumbEl.textContent = "Select or create a page to begin";
-                toggleEditor(false);
-                updateMeta();
-                return;
-            }
-            toggleEditor(true);
-            titleInputEl.value = page.title;
-            noteEl.value = page.content || "";
-            breadcrumbEl.textContent = breadcrumbForPage(page.id);
-            updateMeta();
-        }
-
-        function applySnapshot(snapshot) {
-            state.tree = snapshot.tree || [];
-            state.pagesById = snapshot.pagesById || {};
-            if (snapshot.selectedPageId && state.pagesById[snapshot.selectedPageId]) {
-                state.selectedPageId = snapshot.selectedPageId;
-            } else if (state.selectedPageId && state.pagesById[state.selectedPageId]) {
-                state.selectedPageId = state.selectedPageId;
-            } else if (state.tree[0]) {
-                state.selectedPageId = state.tree[0].id;
-            } else {
-                state.selectedPageId = null;
-            }
-            renderTree();
-            renderEditor();
-        }
-
-        async function refreshWorkspace() {
-            try {
-                const res = await fetch("/api/pages");
-                const data = await res.json();
-                applySnapshot(data);
-                setStatus("Ready", "ok");
-                state.unsavedContent = false;
-                state.unsavedTitle = false;
-            } catch (error) {
-                setStatus("Load failed", "error");
-            }
-        }
-
-        async function createPage(parentId) {
-            const title = window.prompt("Page title?", parentId ? "New child page" : "New page");
-            if (title === null) return;
-            try {
-                setStatus("Creating...");
-                const res = await fetch("/api/pages", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ parentId: parentId || null, title })
-                });
-                if (!res.ok) throw new Error("Create failed");
-                const data = await res.json();
-                applySnapshot(data.snapshot);
-                state.selectedPageId = data.page.id;
-                renderTree();
-                renderEditor();
-                setStatus("Page created", "ok");
-            } catch (error) {
-                setStatus("Create failed", "error");
-            }
-        }
-
-        async function saveCurrentPage() {
-            const page = selectedPage();
-            if (!page) return;
-            saveBtn.disabled = true;
-            setStatus("Saving...");
-            try {
-                const newTitle = titleInputEl.value.trim();
-                if (!newTitle) {
-                    setStatus("Title required", "error");
-                    return;
-                }
-                if (newTitle !== page.title) {
-                    const renameRes = await fetch("/api/pages/" + page.id + "/title", {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ title: newTitle })
-                    });
-                    if (!renameRes.ok) throw new Error("Rename failed");
-                }
-                const contentRes = await fetch("/api/pages/" + page.id + "/content", {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ content: noteEl.value })
-                });
-                if (!contentRes.ok) throw new Error("Save failed");
-                await refreshWorkspace();
-                setStatus("Saved", "ok");
-            } catch (error) {
-                setStatus("Save failed", "error");
-            } finally {
-                saveBtn.disabled = false;
-            }
-        }
-
-        async function deleteCurrentPage() {
-            const page = selectedPage();
-            if (!page) return;
-            const confirmed = window.confirm(`Delete "${page.title}" and all child pages?`);
-            if (!confirmed) return;
-            try {
-                setStatus("Deleting...");
-                const res = await fetch("/api/pages/" + page.id, { method: "DELETE" });
-                if (!res.ok) throw new Error("Delete failed");
-                const data = await res.json();
-                applySnapshot(data.snapshot);
-                setStatus("Page deleted", "ok");
-            } catch (error) {
-                setStatus("Delete failed", "error");
-            }
-        }
-
-        treeEl.addEventListener("click", (event) => {
-            const button = event.target.closest("[data-page-id]");
+        tabsEl.addEventListener("click", (event) => {
+            const button = event.target.closest(".tab");
             if (!button) return;
-            const pageId = button.getAttribute("data-page-id");
-            if (!pageId || !state.pagesById[pageId]) return;
-            if (state.unsavedContent || state.unsavedTitle) {
-                const proceed = window.confirm("You have unsaved changes. Switch page anyway?");
-                if (!proceed) return;
-            }
-            state.selectedPageId = pageId;
-            state.unsavedContent = false;
-            state.unsavedTitle = false;
-            renderTree();
-            renderEditor();
-            setStatus("Page selected");
+            setActive(button.dataset.tab);
         });
 
-        noteEl.addEventListener("input", () => {
-            state.unsavedContent = true;
-            updateMeta();
-            setStatus("Unsaved changes");
-        });
-
-        titleInputEl.addEventListener("input", () => {
-            state.unsavedTitle = true;
-            setStatus("Unsaved changes");
-        });
-
-        addRootBtn.addEventListener("click", () => createPage(null));
-        addChildBtn.addEventListener("click", () => createPage(state.selectedPageId));
-        saveBtn.addEventListener("click", saveCurrentPage);
-        deleteBtn.addEventListener("click", deleteCurrentPage);
-
-        document.addEventListener("keydown", (event) => {
-            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
-                event.preventDefault();
-                saveCurrentPage();
-            }
-        });
-
-        window.addEventListener("beforeunload", (event) => {
-            if (!state.unsavedContent && !state.unsavedTitle) return;
-            event.preventDefault();
-            event.returnValue = "";
-        });
-
-        refreshWorkspace();
+        setActive("about");
     </script>
 </body>
 </html>
