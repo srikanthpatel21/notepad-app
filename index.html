@@ -1,34 +1,280 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Notepad</title>
+    <style>
+        :root {
+            --bg-1: #0f172a;
+            --bg-2: #1e1b4b;
+            --bg-3: #312e81;
+            --panel: rgba(15, 23, 42, 0.65);
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --border: rgba(148, 163, 184, 0.25);
+            --success: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 10% 15%, rgba(139, 92, 246, 0.3), transparent 45%),
+                radial-gradient(circle at 85% 10%, rgba(14, 165, 233, 0.22), transparent 40%),
+                linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .app {
+            width: min(980px, 100%);
+            min-height: min(86vh, 760px);
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 24px 60px rgba(2, 6, 23, 0.45);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .title-wrap h1 {
+            margin: 0;
+            font-size: 1.18rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .title-wrap p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status {
+            font-size: 0.88rem;
+            color: var(--muted);
+            min-width: 140px;
+            text-align: right;
+        }
+
+        button {
+            border: none;
+            background: linear-gradient(120deg, var(--accent), #6366f1);
+            color: #fff;
+            font-weight: 600;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.15s ease, filter 0.15s ease;
+        }
+
+        button:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+        }
+
+        .editor-wrap {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            resize: none;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            background: rgba(15, 23, 42, 0.62);
+            color: var(--text);
+            font-size: 1rem;
+            line-height: 1.65;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        textarea::placeholder {
+            color: #a5b4fc;
+            opacity: 0.7;
+        }
+
+        textarea:focus {
+            border-color: rgba(139, 92, 246, 0.8);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+        }
+
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 12px 22px;
+            color: var(--muted);
+            font-size: 0.84rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ok {
+            color: var(--success);
+        }
+
+        .error {
+            color: #f87171;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 12px;
+            }
+
+            .app {
+                min-height: 92vh;
+                border-radius: 14px;
+            }
+
+            .status {
+                text-align: left;
+                min-width: 0;
+            }
+        }
+    </style>
 </head>
 <body>
+    <main class="app">
+        <header class="header">
+            <div class="title-wrap">
+                <h1>My Online Notepad</h1>
+                <p>Simple, clean, and synced with your Raspberry Pi server.</p>
+            </div>
+            <div class="controls">
+                <div id="status" class="status">Loading...</div>
+                <button id="saveBtn" type="button">Save Note</button>
+            </div>
+        </header>
 
-<h2>📝 My Online Notepad</h2>
+        <section class="editor-wrap">
+            <textarea id="note" placeholder="Write your thoughts, tasks, or ideas here..."></textarea>
+        </section>
 
-<textarea id="note" rows="20" cols="80"></textarea><br><br>
+        <footer class="footer">
+            <span id="meta">0 characters</span>
+            <span>Tip: Press Ctrl+S to save quickly.</span>
+        </footer>
+    </main>
 
-<button onclick="save()">Save</button>
+    <script>
+        const noteEl = document.getElementById("note");
+        const saveBtn = document.getElementById("saveBtn");
+        const statusEl = document.getElementById("status");
+        const metaEl = document.getElementById("meta");
+        let hasUnsavedChanges = false;
 
-<script>
-async function load() {
-    const res = await fetch('/notes');
-    const text = await res.text();
-    document.getElementById("note").value = text;
-}
+        function updateMeta() {
+            const length = noteEl.value.length;
+            metaEl.textContent = length + " characters";
+        }
 
-async function save() {
-    await fetch('/notes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: document.getElementById("note").value })
-    });
-    alert("Saved!");
-}
+        function setStatus(message, type) {
+            statusEl.textContent = message;
+            statusEl.classList.remove("ok", "error");
+            if (type === "ok") statusEl.classList.add("ok");
+            if (type === "error") statusEl.classList.add("error");
+        }
 
-load();
-</script>
+        async function load() {
+            try {
+                const res = await fetch("/notes");
+                const text = await res.text();
+                noteEl.value = text;
+                hasUnsavedChanges = false;
+                updateMeta();
+                setStatus("Ready", "ok");
+            } catch (error) {
+                setStatus("Failed to load", "error");
+            }
+        }
 
+        async function save() {
+            saveBtn.disabled = true;
+            setStatus("Saving...");
+            try {
+                await fetch("/notes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: noteEl.value })
+                });
+                hasUnsavedChanges = false;
+                setStatus("Saved", "ok");
+            } catch (error) {
+                setStatus("Save failed", "error");
+            } finally {
+                saveBtn.disabled = false;
+            }
+        }
+
+        noteEl.addEventListener("input", () => {
+            hasUnsavedChanges = true;
+            updateMeta();
+            setStatus("Unsaved changes");
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+                event.preventDefault();
+                save();
+            }
+        });
+
+        saveBtn.addEventListener("click", save);
+
+        window.addEventListener("beforeunload", (event) => {
+            if (!hasUnsavedChanges) return;
+            event.preventDefault();
+            event.returnValue = "";
+        });
+
+        load();
+    </script>
 </body>
 </html>
