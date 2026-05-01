@@ -5,9 +5,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 const rootDir = __dirname;
 
+// Serve static files
 app.use(express.static(rootDir));
 
-app.get("*", (req, res) => {
+// Catch-all handler (FIXED)
+app.use((req, res) => {
     res.sendFile(path.join(rootDir, "index.html"));
 });
 
