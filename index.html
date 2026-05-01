@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Notepad</title>
+    <title>Workspace Notepad</title>
     <style>
         :root {
             --bg-1: #0f172a;
@@ -13,15 +13,11 @@
             --text: #e2e8f0;
             --muted: #94a3b8;
             --accent: #8b5cf6;
-            --accent-hover: #7c3aed;
             --border: rgba(148, 163, 184, 0.25);
             --success: #22c55e;
+            --danger: #ef4444;
         }
-
-        * {
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; }
         body {
             margin: 0;
             min-height: 100vh;
@@ -36,9 +32,8 @@
             align-items: center;
             padding: 24px;
         }
-
         .app {
-            width: min(980px, 100%);
+            width: min(1180px, 100%);
             min-height: min(86vh, 760px);
             background: var(--panel);
             border: 1px solid var(--border);
@@ -46,46 +41,73 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 24px 60px rgba(2, 6, 23, 0.45);
             display: flex;
-            flex-direction: column;
             overflow: hidden;
         }
-
-        .header {
-            padding: 18px 22px;
+        .sidebar {
+            width: min(340px, 44vw);
+            border-right: 1px solid var(--border);
+            background: rgba(2, 6, 23, 0.45);
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+        }
+        .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); }
+        .sidebar-header h2 { margin: 0 0 8px; font-size: 1.02rem; }
+        .sidebar-header p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+        .sidebar-actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .tree { padding: 10px 10px 14px; overflow: auto; flex: 1; }
+        .tree-node { margin: 2px 0; }
+        .node-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            color: var(--text);
+            background: transparent;
+            cursor: pointer;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        .node-row:hover { background: rgba(30, 41, 59, 0.8); border-color: rgba(148, 163, 184, 0.16); }
+        .node-row.active { background: rgba(99, 102, 241, 0.22); border-color: rgba(165, 180, 252, 0.4); }
+        .node-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.94rem; }
+        .tree-node-children { margin-left: 16px; border-left: 1px dashed rgba(148, 163, 184, 0.25); padding-left: 6px; }
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .main-header {
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border);
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 14px;
+            gap: 10px;
             flex-wrap: wrap;
         }
-
-        .title-wrap h1 {
+        .title-wrap { min-width: 0; }
+        .title-input {
             margin: 0;
-            font-size: 1.18rem;
+            width: min(520px, 100%);
+            max-width: 100%;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 7px 10px;
+            color: var(--text);
+            background: transparent;
+            font-size: 1.05rem;
             font-weight: 700;
-            letter-spacing: 0.2px;
+            outline: none;
         }
-
-        .title-wrap p {
-            margin: 6px 0 0;
+        .title-input:focus { border-color: rgba(139, 92, 246, 0.7); background: rgba(15, 23, 42, 0.56); }
+        .breadcrumb {
+            margin-top: 6px;
             color: var(--muted);
-            font-size: 0.9rem;
+            font-size: 0.84rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .status {
-            font-size: 0.88rem;
-            color: var(--muted);
-            min-width: 140px;
-            text-align: right;
-        }
-
+        .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .status { font-size: 0.88rem; color: var(--muted); min-width: 90px; }
         button {
             border: none;
             background: linear-gradient(120deg, var(--accent), #6366f1);
@@ -96,29 +118,12 @@
             cursor: pointer;
             transition: transform 0.15s ease, filter 0.15s ease;
         }
-
-        button:hover {
-            filter: brightness(1.05);
-            transform: translateY(-1px);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-            transform: none;
-        }
-
-        .editor-wrap {
-            padding: 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
+        button:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+        button:disabled { cursor: not-allowed; opacity: 0.7; transform: none; }
+        button.secondary { background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(148, 163, 184, 0.32); }
+        button.danger { background: linear-gradient(120deg, #b91c1c, var(--danger)); }
+        .editor-wrap { padding: 20px; flex: 1; display: flex; flex-direction: column; }
         textarea {
             width: 100%;
             height: 100%;
@@ -133,20 +138,11 @@
             outline: none;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-
-        textarea::placeholder {
-            color: #a5b4fc;
-            opacity: 0.7;
-        }
-
-        textarea:focus {
-            border-color: rgba(139, 92, 246, 0.8);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
-        }
-
+        textarea::placeholder { color: #a5b4fc; opacity: 0.7; }
+        textarea:focus { border-color: rgba(139, 92, 246, 0.8); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25); }
         .footer {
             border-top: 1px solid var(--border);
-            padding: 12px 22px;
+            padding: 11px 20px;
             color: var(--muted);
             font-size: 0.84rem;
             display: flex;
@@ -154,66 +150,82 @@
             gap: 8px;
             flex-wrap: wrap;
         }
-
-        .ok {
-            color: var(--success);
+        .ok { color: var(--success); }
+        .error { color: #f87171; }
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            color: var(--muted);
+            border: 1px dashed var(--border);
+            border-radius: 14px;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
         }
-
-        .error {
-            color: #f87171;
-        }
-
         @media (max-width: 640px) {
-            body {
-                padding: 12px;
-            }
-
-            .app {
-                min-height: 92vh;
-                border-radius: 14px;
-            }
-
-            .status {
-                text-align: left;
-                min-width: 0;
-            }
+            body { padding: 10px; }
+            .app { min-height: 95vh; border-radius: 14px; flex-direction: column; }
+            .sidebar { width: 100%; max-height: 42vh; border-right: none; border-bottom: 1px solid var(--border); }
+            .main-header { padding: 14px; }
+            .editor-wrap { padding: 14px; }
         }
     </style>
 </head>
 <body>
     <main class="app">
-        <header class="header">
-            <div class="title-wrap">
-                <h1>My Online Notepad</h1>
-                <p>Simple, clean, and synced with your Raspberry Pi server.</p>
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Pages</h2>
+                <p>Create parent and child pages like a wiki.</p>
+                <div class="sidebar-actions">
+                    <button id="addRootBtn" type="button">+ New Page</button>
+                    <button id="addChildBtn" type="button" class="secondary">+ Child Page</button>
+                </div>
             </div>
-            <div class="controls">
-                <div id="status" class="status">Loading...</div>
-                <button id="saveBtn" type="button">Save Note</button>
-            </div>
-        </header>
-
-        <section class="editor-wrap">
-            <textarea id="note" placeholder="Write your thoughts, tasks, or ideas here..."></textarea>
+            <div id="tree" class="tree"></div>
+        </aside>
+        <section class="main">
+            <header class="main-header">
+                <div class="title-wrap">
+                    <input id="titleInput" class="title-input" type="text" value="" placeholder="Page title">
+                    <div id="breadcrumb" class="breadcrumb">Select or create a page to begin</div>
+                </div>
+                <div class="toolbar">
+                    <div id="status" class="status">Loading...</div>
+                    <button id="saveBtn" type="button">Save</button>
+                    <button id="deleteBtn" type="button" class="danger">Delete</button>
+                </div>
+            </header>
+            <section class="editor-wrap">
+                <textarea id="note" placeholder="Write page content..."></textarea>
+                <div id="emptyState" class="empty-state" style="display:none;">
+                    <strong>No page selected.</strong>
+                    <span>Create a page from the left panel to start writing.</span>
+                </div>
+            </section>
+            <footer class="footer">
+                <span id="meta">0 characters</span>
+                <span>Tip: Press Ctrl+S to save current page.</span>
+            </footer>
         </section>
-
-        <footer class="footer">
-            <span id="meta">0 characters</span>
-            <span>Tip: Press Ctrl+S to save quickly.</span>
-        </footer>
     </main>
-
     <script>
+        const treeEl = document.getElementById("tree");
         const noteEl = document.getElementById("note");
+        const titleInputEl = document.getElementById("titleInput");
         const saveBtn = document.getElementById("saveBtn");
+        const deleteBtn = document.getElementById("deleteBtn");
+        const addRootBtn = document.getElementById("addRootBtn");
+        const addChildBtn = document.getElementById("addChildBtn");
         const statusEl = document.getElementById("status");
         const metaEl = document.getElementById("meta");
-        let hasUnsavedChanges = false;
+        const breadcrumbEl = document.getElementById("breadcrumb");
+        const emptyStateEl = document.getElementById("emptyState");
 
-        function updateMeta() {
-            const length = noteEl.value.length;
-            metaEl.textContent = length + " characters";
-        }
+        const state = { pagesById: {}, tree: [], selectedPageId: null, unsavedContent: false, unsavedTitle: false };
 
         function setStatus(message, type) {
             statusEl.textContent = message;
@@ -222,29 +234,160 @@
             if (type === "error") statusEl.classList.add("error");
         }
 
-        async function load() {
-            try {
-                const res = await fetch("/notes");
-                const text = await res.text();
-                noteEl.value = text;
-                hasUnsavedChanges = false;
+        function selectedPage() {
+            if (!state.selectedPageId) return null;
+            return state.pagesById[state.selectedPageId] || null;
+        }
+
+        function updateMeta() {
+            metaEl.textContent = noteEl.value.length + " characters";
+        }
+
+        function toggleEditor(enabled) {
+            noteEl.style.display = enabled ? "block" : "none";
+            emptyStateEl.style.display = enabled ? "none" : "flex";
+            noteEl.disabled = !enabled;
+            titleInputEl.disabled = !enabled;
+            saveBtn.disabled = !enabled;
+            deleteBtn.disabled = !enabled;
+            addChildBtn.disabled = !enabled;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        function renderTreeNode(node, depth) {
+            const active = node.id === state.selectedPageId ? "active" : "";
+            const safeTitle = escapeHtml(node.title);
+            let html = `
+                <div class="tree-node">
+                    <button class="node-row ${active}" data-page-id="${node.id}" style="padding-left:${10 + depth * 14}px;">
+                        <span>📄</span>
+                        <span class="node-title">${safeTitle}</span>
+                    </button>`;
+            if (node.children && node.children.length > 0) {
+                html += `<div class="tree-node-children">`;
+                html += node.children.map((child) => renderTreeNode(child, depth + 1)).join("");
+                html += `</div>`;
+            }
+            html += `</div>`;
+            return html;
+        }
+
+        function renderTree() {
+            if (!state.tree.length) {
+                treeEl.innerHTML = `<div class="empty-state" style="height:auto;">No pages yet. Create your first page.</div>`;
+                return;
+            }
+            treeEl.innerHTML = state.tree.map((node) => renderTreeNode(node, 0)).join("");
+        }
+
+        function breadcrumbForPage(pageId) {
+            if (!pageId || !state.pagesById[pageId]) return "";
+            const names = [];
+            let cursor = state.pagesById[pageId];
+            while (cursor) {
+                names.unshift(cursor.title);
+                cursor = cursor.parentId ? state.pagesById[cursor.parentId] : null;
+            }
+            return names.join(" / ");
+        }
+
+        function renderEditor() {
+            const page = selectedPage();
+            if (!page) {
+                titleInputEl.value = "";
+                noteEl.value = "";
+                breadcrumbEl.textContent = "Select or create a page to begin";
+                toggleEditor(false);
                 updateMeta();
+                return;
+            }
+            toggleEditor(true);
+            titleInputEl.value = page.title;
+            noteEl.value = page.content || "";
+            breadcrumbEl.textContent = breadcrumbForPage(page.id);
+            updateMeta();
+        }
+
+        function applySnapshot(snapshot) {
+            state.tree = snapshot.tree || [];
+            state.pagesById = snapshot.pagesById || {};
+            if (snapshot.selectedPageId && state.pagesById[snapshot.selectedPageId]) {
+                state.selectedPageId = snapshot.selectedPageId;
+            } else if (state.selectedPageId && state.pagesById[state.selectedPageId]) {
+                state.selectedPageId = state.selectedPageId;
+            } else if (state.tree[0]) {
+                state.selectedPageId = state.tree[0].id;
+            } else {
+                state.selectedPageId = null;
+            }
+            renderTree();
+            renderEditor();
+        }
+
+        async function refreshWorkspace() {
+            try {
+                const res = await fetch("/api/pages");
+                const data = await res.json();
+                applySnapshot(data);
                 setStatus("Ready", "ok");
+                state.unsavedContent = false;
+                state.unsavedTitle = false;
             } catch (error) {
-                setStatus("Failed to load", "error");
+                setStatus("Load failed", "error");
             }
         }
 
-        async function save() {
+        async function createPage(parentId) {
+            const title = window.prompt("Page title?", parentId ? "New child page" : "New page");
+            if (title === null) return;
+            try {
+                setStatus("Creating...");
+                const res = await fetch("/api/pages", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ parentId: parentId || null, title })
+                });
+                if (!res.ok) throw new Error("Create failed");
+                const data = await res.json();
+                applySnapshot(data.snapshot);
+                state.selectedPageId = data.page.id;
+                renderTree();
+                renderEditor();
+                setStatus("Page created", "ok");
+            } catch (error) {
+                setStatus("Create failed", "error");
+            }
+        }
+
+        async function saveCurrentPage() {
+            const page = selectedPage();
+            if (!page) return;
             saveBtn.disabled = true;
             setStatus("Saving...");
             try {
-                await fetch("/notes", {
-                    method: "POST",
+                const newTitle = titleInputEl.value.trim();
+                if (!newTitle) {
+                    setStatus("Title required", "error");
+                    return;
+                }
+                if (newTitle !== page.title) {
+                    const renameRes = await fetch("/api/pages/" + page.id + "/title", {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ title: newTitle })
+                    });
+                    if (!renameRes.ok) throw new Error("Rename failed");
+                }
+                const contentRes = await fetch("/api/pages/" + page.id + "/content", {
+                    method: "PUT",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text: noteEl.value })
+                    body: JSON.stringify({ content: noteEl.value })
                 });
-                hasUnsavedChanges = false;
+                if (!contentRes.ok) throw new Error("Save failed");
+                await refreshWorkspace();
                 setStatus("Saved", "ok");
             } catch (error) {
                 setStatus("Save failed", "error");
@@ -253,28 +396,70 @@
             }
         }
 
+        async function deleteCurrentPage() {
+            const page = selectedPage();
+            if (!page) return;
+            const confirmed = window.confirm(`Delete "${page.title}" and all child pages?`);
+            if (!confirmed) return;
+            try {
+                setStatus("Deleting...");
+                const res = await fetch("/api/pages/" + page.id, { method: "DELETE" });
+                if (!res.ok) throw new Error("Delete failed");
+                const data = await res.json();
+                applySnapshot(data.snapshot);
+                setStatus("Page deleted", "ok");
+            } catch (error) {
+                setStatus("Delete failed", "error");
+            }
+        }
+
+        treeEl.addEventListener("click", (event) => {
+            const button = event.target.closest("[data-page-id]");
+            if (!button) return;
+            const pageId = button.getAttribute("data-page-id");
+            if (!pageId || !state.pagesById[pageId]) return;
+            if (state.unsavedContent || state.unsavedTitle) {
+                const proceed = window.confirm("You have unsaved changes. Switch page anyway?");
+                if (!proceed) return;
+            }
+            state.selectedPageId = pageId;
+            state.unsavedContent = false;
+            state.unsavedTitle = false;
+            renderTree();
+            renderEditor();
+            setStatus("Page selected");
+        });
+
         noteEl.addEventListener("input", () => {
-            hasUnsavedChanges = true;
+            state.unsavedContent = true;
             updateMeta();
             setStatus("Unsaved changes");
         });
 
+        titleInputEl.addEventListener("input", () => {
+            state.unsavedTitle = true;
+            setStatus("Unsaved changes");
+        });
+
+        addRootBtn.addEventListener("click", () => createPage(null));
+        addChildBtn.addEventListener("click", () => createPage(state.selectedPageId));
+        saveBtn.addEventListener("click", saveCurrentPage);
+        deleteBtn.addEventListener("click", deleteCurrentPage);
+
         document.addEventListener("keydown", (event) => {
             if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
                 event.preventDefault();
-                save();
+                saveCurrentPage();
             }
         });
 
-        saveBtn.addEventListener("click", save);
-
         window.addEventListener("beforeunload", (event) => {
-            if (!hasUnsavedChanges) return;
+            if (!state.unsavedContent && !state.unsavedTitle) return;
             event.preventDefault();
             event.returnValue = "";
         });
 
-        load();
+        refreshWorkspace();
     </script>
 </body>
 </html>
